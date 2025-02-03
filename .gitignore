@@ -3,3 +3,5 @@ temp
 build
 yarn.lock
 vim.session
+.idea
+commit.sh
