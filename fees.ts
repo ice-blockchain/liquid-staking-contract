@@ -4,7 +4,7 @@
  * Currently only message related function
 */
 
-import { Cell, Slice, Message, loadMessageRelaxed, Dictionary  } from 'ton-core';
+import { Cell, Slice, Message, loadMessageRelaxed, Dictionary  } from '@ton/core';
 
 export type MsgPrices = ReturnType<typeof configParseMsgPrices>
 

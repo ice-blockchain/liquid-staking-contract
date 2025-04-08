@@ -1,5 +1,5 @@
 import { Elector } from './Elector';
-import { Address, Cell, beginCell, Dictionary } from 'ton-core';
+import { Address, Cell, beginCell, Dictionary } from '@ton/core';
 import { loadConfig, getStakeConf, packElect, getElectionsConf } from './ValidatorUtils';
 import { Blockchain, BlockchainContractProvider, SandboxContractProvider, TickOrTock } from '@ton-community/sandbox';
 

@@ -1,6 +1,6 @@
-import { Blockchain,BlockchainSnapshot, BlockchainTransaction, createShardAccount,internal,SandboxContract,SendMessageResult,SmartContractTransaction,TreasuryContract } from "@ton-community/sandbox";
-import { Address, Cell, beginCell, toNano, Sender, Dictionary } from 'ton-core';
-import { compile } from '@ton-community/blueprint';
+import { Blockchain,BlockchainSnapshot, BlockchainTransaction, createShardAccount,internal,SandboxContract,SendMessageResult,SmartContractTransaction,TreasuryContract } from "@ton/sandbox";
+import { Address, Cell, beginCell, toNano, Sender, Dictionary } from '@ton/core';
+import { compile } from '@ton/blueprint';
 import '@ton-community/test-utils';
 import { keyPairFromSeed, getSecureRandomBytes, getSecureRandomWords, KeyPair } from 'ton-crypto';
 import { JettonMinter as DAOJettonMinter, jettonContentToCell } from '../contracts/jetton_dao/wrappers/JettonMinter';
@@ -20,7 +20,7 @@ import { ConfigTest } from "../wrappers/ConfigTest";
 import { computeMessageForwardFees, getMsgPrices } from "../fees";
 import { getRandomInt, randomAddress } from "../contracts/jetton_dao/tests/utils";
 import { PayoutCollectionConfig } from "../wrappers/PayoutNFTCollection";
-import { flattenTransaction } from "@ton-community/test-utils";
+import { flattenTransaction } from "@ton/test-utils";
 
 type Validator = {
   wallet: SandboxContract<TreasuryContract>,
@@ -1322,18 +1322,18 @@ describe('Integrational tests', () => {
             from: controller.address,
             to: pool.address,
             op: Op.pool.request_loan,
-            body: (x) => {x!;
-                const rs = x.beginParse().skip(64 + 32);
+            body: (x) => {
+                const rs = x?.beginParse().skip(64 + 32);
                 // That's probably too much
-                const minLoanSent = rs.loadCoins();
-                const maxLoanSent = rs.loadCoins();
-                const maxInterestSent = rs.loadUint(24);
+                const minLoanSent = rs?.loadCoins();
+                const maxLoanSent = rs?.loadCoins();
+                const maxInterestSent = rs?.loadUint(24);
                 const requestMatch =
                     minLoanSent == minLoan &&
                     maxLoanSent == maxLoan &&
                     maxInterestSent == maxInterest;
                 // Meta we might want to check
-                const metaMatch = testControllerMeta(rs.preloadRef(), {
+                const metaMatch = testControllerMeta(rs?.preloadRef(), {
                     id: 0,
                     governor: deployer.address,
                     pool: pool.address,

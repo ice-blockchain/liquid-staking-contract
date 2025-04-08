@@ -1,10 +1,10 @@
-import { Blockchain,BlockchainSnapshot, createShardAccount,internal,SandboxContract,SendMessageResult,SmartContractTransaction,TreasuryContract } from "@ton-community/sandbox";
+import { Blockchain,BlockchainSnapshot, createShardAccount,internal,SandboxContract,SendMessageResult,SmartContractTransaction,TreasuryContract } from "@ton/sandbox";
 import { Controller, controllerConfigToCell } from '../wrappers/Controller';
-import { Address, Sender, Cell, toNano, Dictionary, beginCell } from 'ton-core';
+import { Address, Sender, Cell, toNano, Dictionary, beginCell } from '@ton/core';
 import { keyPairFromSeed, getSecureRandomBytes, getSecureRandomWords, KeyPair } from 'ton-crypto';
 import '@ton-community/test-utils';
-import { compile } from '@ton-community/blueprint';
-import { FlatTransactionComparable, randomAddress } from "@ton-community/test-utils";
+import { compile } from '@ton/blueprint';
+import { FlatTransactionComparable, randomAddress } from "@ton/test-utils";
 import { calcMaxPunishment, getElectionsConf, getValidatorsConf, getVset, loadConfig, packValidatorsSet } from "../wrappers/ValidatorUtils";
 import { buff2bigint, computedGeneric, differentAddress, getMsgExcess, getRandomInt, getRandomTon, sendBulkMessage } from "../utils";
 import { Conf, ControllerState, Errors, Op } from "../PoolConstants";
@@ -541,7 +541,7 @@ describe('Cotroller mock', () => {
                                       reqBalance - controllerSmc.balance + toNano('1'));
 
 
-        const res = controllerSmc.receiveMessage(internal({
+        const res = await controllerSmc.receiveMessage(internal({
           from: validator.wallet.address,
           to: controller.address,
           body: Controller.requestLoanMessage(minLoan, maxLoan, interest),
@@ -711,7 +711,7 @@ describe('Cotroller mock', () => {
         confDict.set(40, beginCell()
                          .storeUint(1, 8) //prefix
                          .storeCoins(toNano('5000')) //Default flat fine
-                         .storeUint((1 << 32) - 1, 32) // All of the stake
+                         .storeUint((1 << 32) - 1, 32) // All the stake
                          .storeUint(256, 16)
                          .storeUint(256, 16)
                          .storeUint(0, 16)
@@ -793,7 +793,7 @@ describe('Cotroller mock', () => {
         const maxInterest = getRandomInt(100, 300) << 8;
         const reqLoanMsg  = Controller.requestLoanMessage(loanAmount, loanAmount, maxInterest);
         const controllerSmc = await bc.getContract(controller.address);
-        const reqRes  =  controllerSmc.receiveMessage(internal({
+        const reqRes  =  await controllerSmc.receiveMessage(internal({
           from: validator.wallet.address,
           to: controller.address,
           body: reqLoanMsg,
