@@ -14,7 +14,7 @@ FILES=(
   "JettonMinter.compile.ts"
   "JettonMinter.ts"
   "JettonWallet.compile.ts"
-  "JettonWallet.ts"
+  # "JettonWallet.ts"
   "ui-utils.ts"
 )
 
@@ -38,15 +38,16 @@ FUNC_FILES=(
   jetton-minter.func
   jetton-utils.func
   jetton-wallet.func
-  messages.func
-  op-codes.func
+  # messages.func
+  # op-codes.func
   params.func
-  stdlib.func
+  # stdlib.func
 )
 
 # Symlink them into wrappers
-for file in "${FUNC_FILES[@]}"; do
-  ln -sf "../$SRC_DIR_FUNCS/$file" "$DEST_DIR/$file"
-done
+# for file in "${FUNC_FILES[@]}"; do
+#   ln -sf "../$SRC_DIR_FUNCS/$file" "$DEST_DIR/$file"
+# done
 
-echo ".func symbolic links created in $DEST_DIR"
+# echo ".func symbolic links created in $DEST_DIR"
+

@@ -9,7 +9,7 @@ WRAPPER_FILES=(
   "JettonMinter.compile.ts"
   "JettonMinter.ts"
   "JettonWallet.compile.ts"
-  "JettonWallet.ts"
+  # "JettonWallet.ts"
   "ui-utils.ts"
 )
 

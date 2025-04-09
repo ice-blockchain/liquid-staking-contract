@@ -23,8 +23,8 @@ FILES=(
   "VoteKeeperTests.ts"
   "VoteKeeper.ts"
   "Voting.compile.ts"
-  "VotingResults.compile.ts"
-  "VotingResults.ts"
+  # "VotingResults.compile.ts"
+  # "VotingResults.ts"
   "VotingTests.ts"
   "Voting.ts"
 )
@@ -53,11 +53,11 @@ JETTON_FUNC_FILES=(
   jetton-utils.func
   jetton-wallet-auth.func
   jetton-wallet.func
-  messages.func
-  op-codes.func
+  # messages.func
+  # op-codes.func
   params.func
-  stdlib.func
-  types.func
+  # stdlib.func
+  # types.func
   vote-keeper.func
   voting.func
   voting-results.func
@@ -65,8 +65,8 @@ JETTON_FUNC_FILES=(
   voting.tlb
 )
 
-for file in "${JETTON_FUNC_FILES[@]}"; do
-  ln -sf "../$SRC_DIR_JETTON_FUNCS/$file" "$DEST_DIR/$file"
-done
+# for file in "${JETTON_FUNC_FILES[@]}"; do
+#   ln -sf "../$SRC_DIR_JETTON_FUNCS/$file" "$DEST_DIR/$file"
+# done
 
-echo "Jetton DAO .func and .tlb symbolic links created in $DEST_DIR"
+# echo "Jetton DAO .func and .tlb symbolic links created in $DEST_DIR"

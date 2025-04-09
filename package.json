@@ -1,23 +1,25 @@
 {
-    "name": "liquid_staking",
-    "version": "0.0.1",
-    "license": "MIT",
-    "scripts": {
-        "test": "jest"
-    },
-    "devDependencies": {
-        "@ton/blueprint": "^0.30.0",
-        "@ton/sandbox": "^0.28.0",
-        "@ton/test-utils": "^0.5.0",
-        "@types/jest": "^29.5.14",
-        "@types/node": "^18.19.86",
-        "jest": "^29.7.0",
-        "prettier": "^3.5.3",
-        "ton": "^13.9.0",
-        "ton-core": "^0.53.0",
-        "ton-crypto": "^3.2.0",
-        "ts-jest": "^29.3.1",
-        "ts-node": "^10.9.2",
-        "typescript": "^5.8.3"
-    }
+  "name": "liquid_staking",
+  "version": "0.0.1",
+  "license": "MIT",
+  "scripts": {
+    "test": "jest",
+    "link": "./awaited_minter.link.sh; ./jetton_dao.link.sh",
+    "unlink": "./awaited_minter.unlink.sh; ./jetton_dao.unlink.sh"
+  },
+  "devDependencies": {
+    "@ton/blueprint": "^0.30.0",
+    "@ton/sandbox": "^0.28.0",
+    "@ton/test-utils": "^0.5.0",
+    "@types/jest": "^29.5.14",
+    "@types/node": "^18.19.86",
+    "jest": "^29.7.0",
+    "prettier": "^3.5.3",
+    "ton": "^13.9.0",
+    "ton-core": "^0.53.0",
+    "ton-crypto": "^3.2.0",
+    "ts-jest": "^29.3.1",
+    "ts-node": "^10.9.2",
+    "typescript": "^5.8.3"
+  }
 }
