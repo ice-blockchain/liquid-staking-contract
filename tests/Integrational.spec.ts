@@ -1,24 +1,43 @@
 import { Blockchain,BlockchainSnapshot, BlockchainTransaction, createShardAccount,internal,SandboxContract,SendMessageResult,SmartContractTransaction,TreasuryContract } from "@ton/sandbox";
 import { Address, Cell, beginCell, toNano, Sender, Dictionary } from '@ton/core';
 import { compile } from '@ton/blueprint';
-import '@ton-community/test-utils';
+import '@ton/test-utils';
 import { keyPairFromSeed, getSecureRandomBytes, getSecureRandomWords, KeyPair } from 'ton-crypto';
 import { JettonMinter as DAOJettonMinter, jettonContentToCell } from '../contracts/jetton_dao/wrappers/JettonMinter';
 import { JettonWallet as DAOWallet } from '../wrappers/JettonWallet';
 import { Pool, PoolConfig } from '../wrappers/Pool';
 import { Controller, ControllerConfig, controllerConfigToCell } from '../wrappers/Controller';
-import { Elector } from "../wrappers/Elector";
-import { Config  } from "../wrappers/Config";
 import { setConsigliere } from "../wrappers/PayoutMinter.compile";
 import { Conf, ControllerState, Errors, Op } from "../PoolConstants";
 import { PayoutCollection, Conf as NFTConf, Op as NFTOp } from "../wrappers/PayoutNFTCollection";
 import { PayoutItem } from "../wrappers/PayoutNFTItem";
-import { testJettonTransfer, buff2bigint, computedGeneric, getRandomTon, testControllerMeta, getExternals, testLog, testLogRepayment, testMintMsg, assertLog, muldivExtra, testJettonNotification, filterTransaction, findTransaction, testJettonBurnNotification, approximatelyEqual, Txiterator, executeTill, differentAddress, executeFrom } from "../utils";
+import {
+    testJettonTransfer,
+    buff2bigint,
+    computedGeneric,
+    getRandomTon,
+    testControllerMeta,
+    getExternals,
+    testLog,
+    testLogRepayment,
+    testMintMsg,
+    assertLog,
+    muldivExtra,
+    testJettonNotification,
+    filterTransaction,
+    findTransaction,
+    testJettonBurnNotification,
+    approximatelyEqual,
+    Txiterator,
+    executeTill,
+    differentAddress,
+    executeFrom,
+    getRandomInt
+} from '../utils';
 import { ElectorTest } from "../wrappers/ElectorTest";
 import { getElectionsConf, getStakeConf, getValidatorsConf, getVset, loadConfig, packStakeConf, packValidatorsConf } from "../wrappers/ValidatorUtils";
 import { ConfigTest } from "../wrappers/ConfigTest";
 import { computeMessageForwardFees, getMsgPrices } from "../fees";
-import { getRandomInt, randomAddress } from "../contracts/jetton_dao/tests/utils";
 import { PayoutCollectionConfig } from "../wrappers/PayoutNFTCollection";
 import { flattenTransaction } from "@ton/test-utils";
 
@@ -1333,15 +1352,18 @@ describe('Integrational tests', () => {
                     maxLoanSent == maxLoan &&
                     maxInterestSent == maxInterest;
                 // Meta we might want to check
-                const metaMatch = testControllerMeta(rs?.preloadRef(), {
-                    id: 0,
-                    governor: deployer.address,
-                    pool: pool.address,
-                    approver: deployer.address,
-                    halter: deployer.address
-                });
+                if (rs) {
+                    const metaMatch = testControllerMeta(rs.preloadRef(), {
+                        id: 0,
+                        governor: deployer.address,
+                        pool: pool.address,
+                        approver: deployer.address,
+                        halter: deployer.address
+                    });
 
-                return requestMatch && metaMatch;
+                    return requestMatch && metaMatch;
+                }
+                return false;
             },
             success: true
         });
@@ -1941,7 +1963,7 @@ describe('Integrational tests', () => {
                     }
                     else {
                         // Can do both
-                        actionId = getRandomInt(0, 1, 3);
+                        actionId = getRandomInt(0, 1, 2);
                     }
                 }
                 else {

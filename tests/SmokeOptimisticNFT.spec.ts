@@ -4,7 +4,7 @@ import { Pool } from '../wrappers/Pool';
 import { Controller } from '../wrappers/Controller';
 import { JettonMinter as DAOJettonMinter, jettonContentToCell } from '../contracts/jetton_dao/wrappers/JettonMinter';
 import { JettonWallet as PoolJettonWallet } from '../wrappers/JettonWallet';
-import '@ton-community/test-utils';
+import '@ton/test-utils';
 import { compile } from '@ton/blueprint';
 import { Conf, Op } from "../PoolConstants";
 import { getElectionsConf, getVset, loadConfig, packValidatorsSet } from "../wrappers/ValidatorUtils";

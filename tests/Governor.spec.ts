@@ -7,11 +7,10 @@ import { JettonWallet as PoolJettonWallet } from '../wrappers/JettonWallet';
 import '@ton/test-utils';
 import { compile } from '@ton/blueprint';
 import { Conf, Op } from "../PoolConstants";
-import { randomAddress } from '../contracts/jetton_dao/tests/utils';
 import { Errors } from '../PoolConstants';
 import { differentAddress, getRandomInt, getRandomTon } from '../utils';
 import { getMsgPrices } from '../fees';
-import { flattenTransaction } from '@ton/test-utils';
+import { flattenTransaction, randomAddress } from '@ton/test-utils';
 
 describe('Governor actions tests', () => {
     let pool_code: Cell;

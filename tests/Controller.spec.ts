@@ -2,7 +2,7 @@ import { Blockchain,BlockchainSnapshot, createShardAccount,internal,SandboxContr
 import { Controller, controllerConfigToCell } from '../wrappers/Controller';
 import { Address, Sender, Cell, toNano, Dictionary, beginCell } from '@ton/core';
 import { keyPairFromSeed, getSecureRandomBytes, getSecureRandomWords, KeyPair } from 'ton-crypto';
-import '@ton-community/test-utils';
+import '@ton/test-utils';
 import { compile } from '@ton/blueprint';
 import { FlatTransactionComparable, randomAddress } from "@ton/test-utils";
 import { calcMaxPunishment, getElectionsConf, getValidatorsConf, getVset, loadConfig, packValidatorsSet } from "../wrappers/ValidatorUtils";
