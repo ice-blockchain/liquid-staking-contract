@@ -163,8 +163,7 @@ describe('Integrational tests', () => {
     let assertGetLoan:(controller: SandboxContract<Controller>, amount: bigint, exp_success: boolean, min_amount?:bigint) => Promise<SendMessageResult>;
     // let getLoanWithExpProfit:(controller: SandboxContract<Controller>, exp_profit: bigint) => Promise<bigint>;
 
-
-    beforeAll(async () => {
+    const initializeData = async () => {
         bc = await Blockchain.create();
         deployer = await bc.treasury('deployer', {workchain: -1, balance: toNano("1000000000")});
         controller_code = await compile('Controller');
@@ -222,26 +221,26 @@ describe('Integrational tests', () => {
 
         const content   = jettonContentToCell({type:1,uri:"https://example.com/1.json"});
         poolJetton      =   bc.openContract(DAOJettonMinter.createFromConfig({
-                                                  admin:deployer.address,
-                                                  content,
-                                                  voting_code:dao_voting_code,
-                                                  },
-                                                  dao_minter_code));
+                admin:deployer.address,
+                content,
+                voting_code:dao_voting_code,
+            },
+            dao_minter_code));
         poolConfig = {
-              pool_jetton : poolJetton.address,
-              pool_jetton_supply : 0n,
-              optimistic_deposit_withdrawals: 0n,
+            pool_jetton : poolJetton.address,
+            pool_jetton_supply : 0n,
+            optimistic_deposit_withdrawals: 0n,
 
-              sudoer : deployer.address,
-              governor : deployer.address,
-              interest_manager : deployer.address,
-              halter : deployer.address,
-              approver : deployer.address,
+            sudoer : deployer.address,
+            governor : deployer.address,
+            interest_manager : deployer.address,
+            halter : deployer.address,
+            approver : deployer.address,
 
-              controller_code : controller_code,
-              pool_jetton_wallet_code : dao_wallet_code,
-              payout_minter_code : payout_minter_code,
-              vote_keeper_code : dao_vote_keeper_code,
+            controller_code : controller_code,
+            pool_jetton_wallet_code : dao_wallet_code,
+            payout_minter_code : payout_minter_code,
+            vote_keeper_code : dao_vote_keeper_code,
         };
 
         const electorAddress = Address.parse('Ef8zMzMzMzMzMzMzMzMzMzMzMzMzMzMzMzMzMzMzMzMzM0vF');
@@ -249,18 +248,18 @@ describe('Integrational tests', () => {
 
 
         await bc.setShardAccount(electorAddress, createShardAccount({
-          address: electorAddress,
-          code: elector_code,
-          data: ElectorTest.emptyState(buff2bigint(loadConfig(bc.config).get(34)!.hash())),
-          balance: toNano('1000')
+            address: electorAddress,
+            code: elector_code,
+            data: ElectorTest.emptyState(buff2bigint(loadConfig(bc.config).get(34)!.hash())),
+            balance: toNano('1000')
         }));
         elector = bc.openContract(ElectorTest.createFromAddress(electorAddress));
 
         await bc.setShardAccount(configAddress, createShardAccount({
-          address: configAddress,
-          code: config_code,
-          data: ConfigTest.configState(bc.config),
-          balance: toNano('1000')
+            address: configAddress,
+            code: config_code,
+            data: ConfigTest.configState(bc.config),
+            balance: toNano('1000')
         }));
         config = bc.openContract(ConfigTest.createFromAddress(configAddress));
 
@@ -272,30 +271,30 @@ describe('Integrational tests', () => {
         await poolJetton.sendChangeAdmin(deployer.getSender(), pool.address);
 
         loadSnapshot = async (name:string) => {
-          const state = snapStates.get(name);
-          if(!state)
-            throw(Error(`Can't find state ${name}\nCheck tests execution order`));
-          await bc.loadFrom(state);
+            const state = snapStates.get(name);
+            if(!state)
+                throw(Error(`Can't find state ${name}\nCheck tests execution order`));
+            await bc.loadFrom(state);
         }
 
         snapStates = new Map<string, BlockchainSnapshot>();
         snapStates.set('initial', bc.snapshot());
         getContractData = async (address: Address) => {
-          const smc = await bc.getContract(address);
-          if(!smc.account.account)
-            throw("Account not found")
-          if(smc.account.account.storage.state.type != "active" )
-            throw("Atempting to get data on inactive account");
-          if(!smc.account.account.storage.state.state.data)
-            throw("Data is not present");
-          return smc.account.account.storage.state.state.data
+            const smc = await bc.getContract(address);
+            if(!smc.account.account)
+                throw("Account not found")
+            if(smc.account.account.storage.state.type != "active" )
+                throw("Atempting to get data on inactive account");
+            if(!smc.account.account.storage.state.state.data)
+                throw("Data is not present");
+            return smc.account.account.storage.state.state.data
         }
         setContractData = async (address, data) => {
             const smc = await bc.getContract(address);
             if(!smc.account.account)
-              throw("Account not found")
+                throw("Account not found")
             if(smc.account.account.storage.state.type != "active" )
-              throw("Atempting to get data on inactive account");
+                throw("Atempting to get data on inactive account");
 
             const newAccount = createShardAccount({
                 address,
@@ -339,7 +338,7 @@ describe('Integrational tests', () => {
             }
 
             const walletContract = bc.openContract(DAOWallet.createFromAddress(
-                    await poolJetton.getWalletAddress(walletAddr)
+                await poolJetton.getWalletAddress(walletAddr)
             ));
             return await walletContract.getJettonBalance()
         }
@@ -348,8 +347,8 @@ describe('Integrational tests', () => {
             const poolData = await pool.getFullData();
             const poolBalance = await getContractBalance(pool.address);
             const cred = poolBalance - muldivExtra(poolData.requestedForWithdrawal,
-                                                   poolData.totalBalance,
-                                                   poolData.supply) - Conf.minStoragePool;
+                poolData.totalBalance,
+                poolData.supply) - Conf.minStoragePool;
             // console.log(`Pool balance:${poolBalance}`);
             // console.log(`Cred:${cred}`);
             const balanced = BigInt(256 + Conf.disbalanceTolerance) * poolData.totalBalance / 512n;
@@ -357,27 +356,27 @@ describe('Integrational tests', () => {
             return  cred < balanced ? cred : balanced;
         };
         updateConfig = async () => {
-          // Loading data from config contract and setting as sandbox config
-          const confData = await getContractData(configAddress);
-          const confCell = confData.beginParse().preloadRef();
-          bc.setConfig(confCell);
-          return confCell;
+            // Loading data from config contract and setting as sandbox config
+            const confData = await getContractData(configAddress);
+            const confCell = confData.beginParse().preloadRef();
+            bc.setConfig(confCell);
+            return confCell;
         }
 
         waitNextRound = async () => {
-          const nextVset = getVset(bc.config, 36);
-          // Setting vset
-          bc.now = getCurTime();
-          if(bc.now < nextVset.utime_since)
-            bc.now = nextVset.utime_since;
+            const nextVset = getVset(bc.config, 36);
+            // Setting vset
+            bc.now = getCurTime();
+            if(bc.now < nextVset.utime_since)
+                bc.now = nextVset.utime_since;
 
-          await config.sendTickTock("tock");
-          const newConf = await updateConfig();
-          // Should change to the current vset
-          const newVset = getVset(newConf, 34);
-          expect(newVset).toEqual(nextVset);
-          // Should trigger unfreeze if possible
-          await elector.sendTickTock("tick");
+            await config.sendTickTock("tock");
+            const newConf = await updateConfig();
+            // Should change to the current vset
+            const newVset = getVset(newConf, 34);
+            expect(newVset).toEqual(nextVset);
+            // Should trigger unfreeze if possible
+            await elector.sendTickTock("tick");
         }
         waitUnlock = async (since:number) => {
             const unlockTime = since + eConf.stake_held_for + 61;
@@ -386,94 +385,94 @@ describe('Integrational tests', () => {
         }
 
         announceElections = async () => {
-          const curVset = getVset(bc.config, 34);
-          const curTime = getCurTime();
-          const electBegin = curVset.utime_unitl - eConf.begin_before + 1;
+            const curVset = getVset(bc.config, 34);
+            const curTime = getCurTime();
+            const electBegin = curVset.utime_unitl - eConf.begin_before + 1;
 
-          const prevElections = await elector.getActiveElectionId();
+            const prevElections = await elector.getActiveElectionId();
 
-          if(curTime < electBegin) {
-              bc.now = electBegin;
-          }
-          else if(prevElections != 0) {
-              // Either not closed yet because of time or lack of stake
-              return prevElections;
-          }
+            if(curTime < electBegin) {
+                bc.now = electBegin;
+            }
+            else if(prevElections != 0) {
+                // Either not closed yet because of time or lack of stake
+                return prevElections;
+            }
 
-          let curElections = prevElections;
+            let curElections = prevElections;
 
-          do {
-              await elector.sendTickTock("tick");
-              curElections = await elector.getActiveElectionId();
-          } while(curElections == 0 || prevElections == curElections);
+            do {
+                await elector.sendTickTock("tick");
+                curElections = await elector.getActiveElectionId();
+            } while(curElections == 0 || prevElections == curElections);
 
-          return curElections;
+            return curElections;
         }
 
         runElections = async (profitable: boolean = true) => {
 
-          await announceElections();
+            await announceElections();
 
-          if(profitable) {
-            // Elector profits
-            await bc.sendMessage(internal({
-              from: new Address(-1, Buffer.alloc(32, 0)),
-              to: elector.address,
-              body: beginCell().endCell(),
-              value: toNano('100000'),
-            }));
-          }
+            if(profitable) {
+                // Elector profits
+                await bc.sendMessage(internal({
+                    from: new Address(-1, Buffer.alloc(32, 0)),
+                    to: elector.address,
+                    body: beginCell().endCell(),
+                    value: toNano('100000'),
+                }));
+            }
 
-          let electState  = await elector.getParticipantListExtended();
-          const partCount = electState.list.length;
-          let curStake    = electState.total_stake;
-          let stakeSize   = sConf.min_stake + toNano('1');
-          let i           = 0;
+            let electState  = await elector.getParticipantListExtended();
+            const partCount = electState.list.length;
+            let curStake    = electState.total_stake;
+            let stakeSize   = sConf.min_stake + toNano('1');
+            let i           = 0;
 
-          while(i < validators.length
-                && (curStake < sConf.min_total_stake || i + partCount < vConf.min_validators)) {
-            const validator = validators[i++];
-            const hasStake  = await elector.getReturnedStake(validator.wallet.address);
-            if(hasStake > 0n) {
-                // Get stake back
-                const rec = await elector.sendRecoverStake(validator.wallet.getSender());
-                expect(rec.transactions).toHaveTransaction({
+            while(i < validators.length
+            && (curStake < sConf.min_total_stake || i + partCount < vConf.min_validators)) {
+                const validator = validators[i++];
+                const hasStake  = await elector.getReturnedStake(validator.wallet.address);
+                if(hasStake > 0n) {
+                    // Get stake back
+                    const rec = await elector.sendRecoverStake(validator.wallet.getSender());
+                    expect(rec.transactions).toHaveTransaction({
+                        from: elector.address,
+                        to: validator.wallet.address,
+                        op: Op.elector.recover_stake_ok
+                    });
+                }
+                const res = await elector.sendNewStake(validator.wallet.getSender(),
+                    stakeSize,
+                    validator.wallet.address,
+                    validator.keys.publicKey,
+                    validator.keys.secretKey,
+                    electState.elect_at);
+                expect(res.transactions).toHaveTransaction({
                     from: elector.address,
                     to: validator.wallet.address,
-                    op: Op.elector.recover_stake_ok
+                    op: Op.elector.new_stake_ok
                 });
+                curStake += stakeSize;
             }
-            const res = await elector.sendNewStake(validator.wallet.getSender(),
-                                                   stakeSize,
-                                                   validator.wallet.address,
-                                                   validator.keys.publicKey,
-                                                   validator.keys.secretKey,
-                                                   electState.elect_at);
+
+            // Skipping time till elections
+            bc.now    = electState.elect_at;
+            // Run elections
+            const res = await elector.sendTickTock("tock");
+
+            /*
+             * TODO fix test-utils for non generic transactions
             expect(res.transactions).toHaveTransaction({
               from: elector.address,
-              to: validator.wallet.address,
-              op: Op.elector.new_stake_ok
+              to: config.address
+              ...
             });
-            curStake += stakeSize;
-          }
-
-          // Skipping time till elections
-          bc.now    = electState.elect_at;
-          // Run elections
-          const res = await elector.sendTickTock("tock");
-
-          /*
-           * TODO fix test-utils for non generic transactions
-          expect(res.transactions).toHaveTransaction({
-            from: elector.address,
-            to: config.address
-            ...
-          });
-          */
-          electState = await elector.getParticipantListExtended();
-          expect(electState.finished).toBe(true);
-          // Updating active vset
-          await elector.sendTickTock("tock");
+            */
+            electState = await elector.getParticipantListExtended();
+            expect(electState.finished).toBe(true);
+            // Updating active vset
+            await elector.sendTickTock("tock");
         }
 
         nextRound = async (profitable: boolean = true, count:number = 1, post?:() => void) => {
@@ -524,7 +523,7 @@ describe('Integrational tests', () => {
                 success: true
             });
             if(mintTx === undefined) {
-            // No action phase failures
+                // No action phase failures
                 //console.log(`Pool:${pool.address}`);
                 //console.log(`Minter:${poolJetton.address}`);
                 //console.log(txs.map(x => flattenTransaction(x)));
@@ -542,8 +541,8 @@ describe('Integrational tests', () => {
             const fwdFee = computeMessageForwardFees(msgConf, inMsg);
             const expValue = Conf.notificationAmount + Conf.distributionAmount;
             expect(inMsg.info.value.coins).toBeGreaterThanOrEqual(expValue
-                                                                  - fwdFee.fees
-                                                                  - fwdFee.remaining);
+                - fwdFee.fees
+                - fwdFee.remaining);
 
             // Transfer pool jettons to dest jetton wallet
             expect(txs).toHaveTransaction({
@@ -752,8 +751,8 @@ describe('Integrational tests', () => {
                     // console.log(`expectedSent:${expectedSent}`);
                     // console.log(`returnedSent:${returnedSent}`);
                     return borrowedSent == borrowed
-                           && expectedSent == expected
-                           && returnedSent == returned;
+                        && expectedSent == expected
+                        && returnedSent == returned;
                 }
             });
             if(depositors.length > 0) {
@@ -810,7 +809,7 @@ describe('Integrational tests', () => {
                                  prevPayout: Address | null,
                                  deposit: boolean) => {
             let payout = deposit ? await pool.getDepositMinter()
-                                 : await pool.getWithdrawalMinter();
+                : await pool.getWithdrawalMinter();
             if(expectNew) {
                 expect(txs).toHaveTransaction({
                     from: pool.address,
@@ -840,7 +839,7 @@ describe('Integrational tests', () => {
             // Testing mint of new payout jettons
             const item   = bc.openContract(
                 PayoutItem.createFromAddress(await payout.getNFTAddress(BigInt(index))
-            ));
+                ));
             expect(txs).toHaveTransaction({
                 from: pool.address,
                 to: payout.address,
@@ -895,16 +894,16 @@ describe('Integrational tests', () => {
 
             const res    = await pool.sendDeposit(via, amount);
             const minter = await assertNewPayout(res.transactions,
-                                                 new_round,
-                                                 prevMinter,
-                                                 true);
+                new_round,
+                prevMinter,
+                true);
             const expDepo  = amount - Conf.poolDepositFee;
             const nm       = await assertPayoutMint(res.transactions,
-                                                    minter,
-                                                    billBefore,
-                                                    via.address!,
-                                                    expDepo,
-                                                    index);
+                minter,
+                billBefore,
+                via.address!,
+                expDepo,
+                index);
 
             const dataAfter = await pool.getFullData();
             expect(dataAfter.requestedForDeposit).toEqual(dataBefore.requestedForDeposit + expDepo);
@@ -972,8 +971,8 @@ describe('Integrational tests', () => {
 
             const poolBalance = await getContractBalance(pool.address);
             const res = await withdrawJetton.sendBurnWithParams(via, toNano('1.05'),
-                                                                amount,
-                                                                withdrawAddr, !optimistic, fill_or_kill);
+                amount,
+                withdrawAddr, !optimistic, fill_or_kill);
             const poolAfter = await pool.getFullData();
             // Shold burn successfully
             expect(res.transactions).toHaveTransaction({
@@ -1022,7 +1021,7 @@ describe('Integrational tests', () => {
                     expect(poolAfter.totalBalance).toEqual(poolBefore.totalBalance - tonAmount);
                     expect(poolAfter.supply).toEqual(poolBefore.supply - amount);
                     return {burnt: amount, distributed: tonAmount} as DistributionComplete;
-               }
+                }
             }
             if(fill_or_kill) {
                 // Expect to mint back burned amount
@@ -1034,15 +1033,15 @@ describe('Integrational tests', () => {
             }
             // Otherwise we fall into pessimistic withdraw procedure
             const minter = await assertNewPayout(res.transactions,
-                                                 new_round,
-                                                 prevMinter,
-                                                 false);
+                new_round,
+                prevMinter,
+                false);
             const nm     = await assertPayoutMint(res.transactions,
-                                                  minter,
-                                                  billBefore,
-                                                  via.address!,
-                                                  amount,
-                                                  index);
+                minter,
+                billBefore,
+                via.address!,
+                amount,
+                index);
             expect(poolAfter.requestedForWithdrawal).toEqual(poolBefore.requestedForWithdrawal + amount);
             expect(poolAfter.totalBalance).toEqual(poolBefore.totalBalance);
             expect(poolAfter.withdrawalPayout).toEqualAddress(minter.address);
@@ -1129,7 +1128,9 @@ describe('Integrational tests', () => {
             return totalProfit;
         }
         */
-    });
+    };
+
+    beforeAll(initializeData);
     it('Deploy controller', async () => {
         const res = await pool.sendRequestControllerDeploy(validator.wallet.getSender(),
                           Conf.minStoragePool + Conf.hashUpdateFine + 3n * Conf.stakeRecoverFine + toNano('1'),
@@ -1560,6 +1561,7 @@ describe('Integrational tests', () => {
         let depoAmounts: bigint[];
 
         beforeAll(async () => {
+            await initializeData();
             await loadSnapshot('deployed');
             // Start fresh round
             await nextRound();
@@ -1890,6 +1892,7 @@ describe('Integrational tests', () => {
         let runVdAction: (validator: Validator) => Promise<void>;
         let runVldActions: () => Promise<void>;
         beforeAll(async () => {
+            await initializeData();
             await loadSnapshot('initial');
             validators = [];
             controllers = new Map<string, SandboxContract<Controller>[]>();

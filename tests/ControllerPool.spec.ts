@@ -87,7 +87,7 @@ describe('Controller & Pool', () => {
         blockchain.now = vset.utime_unitl - eConf.begin_before + 1;
     }
 
-    beforeAll(async () => {
+    const initializeData = async () => {
         blockchain = await Blockchain.create();
         blockchain.now = 100;
 
@@ -117,37 +117,37 @@ describe('Controller & Pool', () => {
 
         const content = jettonContentToCell({type:1,uri:"https://example.com/1.json"});
         poolJetton  = blockchain.openContract(DAOJettonMinter.createFromConfig({
-                                                  admin:deployer.address,
-                                                  content,
-                                                  voting_code:dao_voting_code,
-                                                  },
-                                                  dao_minter_code));
+                admin:deployer.address,
+                content,
+                voting_code:dao_voting_code,
+            },
+            dao_minter_code));
         poolConfig = {
-              pool_jetton : poolJetton.address,
-              pool_jetton_supply : 0n,
-              optimistic_deposit_withdrawals: 0n,
+            pool_jetton : poolJetton.address,
+            pool_jetton_supply : 0n,
+            optimistic_deposit_withdrawals: 0n,
 
-              sudoer : deployer.address,
-              governor : governorAddress,
-              interest_manager : deployer.address,
-              halter : deployer.address,
-              approver : deployer.address,
+            sudoer : deployer.address,
+            governor : governorAddress,
+            interest_manager : deployer.address,
+            halter : deployer.address,
+            approver : deployer.address,
 
-              controller_code : controller_code,
-              payout_wallet_code : payout_wallet_code,
-              pool_jetton_wallet_code : dao_wallet_code,
-              payout_minter_code : payout_minter_code,
-              vote_keeper_code : dao_vote_keeper_code,
+            controller_code : controller_code,
+            payout_wallet_code : payout_wallet_code,
+            pool_jetton_wallet_code : dao_wallet_code,
+            payout_minter_code : payout_minter_code,
+            vote_keeper_code : dao_vote_keeper_code,
         };
         pool = blockchain.openContract(Pool.createFromConfig(poolConfig, pool_code));
 
         controllerConfig = {
-          controllerId: 0,
-          validator: deployer.address,
-          pool: pool.address,
-          governor: governorAddress,
-          approver: deployer.address,
-          halter: deployer.address,
+            controllerId: 0,
+            validator: deployer.address,
+            pool: pool.address,
+            governor: governorAddress,
+            approver: deployer.address,
+            halter: deployer.address,
         };
         controller = blockchain.openContract(Controller.createFromConfig(controllerConfig, controller_code));
 
@@ -160,16 +160,16 @@ describe('Controller & Pool', () => {
         });
         const poolJettonDeployResult = await poolJetton.sendDeploy(deployer.getSender(), toNano('1.05'));
         expect(poolJettonDeployResult.transactions).toHaveTransaction({
-                         from: deployer.address,
-                         to: poolJetton.address,
-                         deploy: true,
-                         success: true,
+            from: deployer.address,
+            to: poolJetton.address,
+            deploy: true,
+            success: true,
         });
         // change admin because we need to know jetton address before minting the pool
         const adminTransferResult = await poolJetton.sendChangeAdmin(deployer.getSender(), pool.address);
         expect(adminTransferResult.transactions).toHaveTransaction({
-                         on: poolJetton.address,
-                         success: true,
+            on: poolJetton.address,
+            success: true,
         });
         const controllerDeployResult = await pool.sendRequestControllerDeploy(deployer.getSender(), toNano('100000'), 0);
         expect(controllerDeployResult.transactions).toHaveTransaction({
@@ -193,8 +193,9 @@ describe('Controller & Pool', () => {
         newVset();
         toElections();
         normalState = blockchain.snapshot();
-    });
+    };
 
+    beforeAll(initializeData);
 
     it('should deploy and deposit', async () => {});
 
@@ -219,6 +220,7 @@ describe('Controller & Pool', () => {
         }
 
         afterEach(async () => {
+            await initializeData();
             await blockchain.loadFrom(normalState);
         });
 
@@ -415,6 +417,9 @@ describe('Controller & Pool', () => {
         let thirdController: SandboxContract<Controller>;
         let roundId: number;
         beforeAll(async () => {
+
+            await initializeData();
+
             let config = controllerConfig;
             config.controllerId++;
             anotherController = blockchain.openContract(Controller.createFromConfig(config, controller_code));

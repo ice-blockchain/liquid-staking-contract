@@ -1,4 +1,4 @@
-import { Address, Tuple, TupleItem, TupleItemInt, TupleReader, toNano } from "ton";
+import { Address, Tuple, TupleItem, TupleItemInt, TupleReader, toNano } from "@ton/core";
 import { Cell, Slice, Sender, SenderArguments, ContractProvider, Message, beginCell, Dictionary, MessageRelaxed, Transaction, fromNano } from "@ton/core";
 import { Blockchain, BlockchainTransaction, MessageParams, SendMessageResult, SmartContract, SmartContractTransaction } from "@ton/sandbox";
 import { computeMessageForwardFees, MsgPrices } from "./fees";
