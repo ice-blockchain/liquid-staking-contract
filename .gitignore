@@ -5,3 +5,4 @@ yarn.lock
 vim.session
 .idea
 commit.sh
+.env
