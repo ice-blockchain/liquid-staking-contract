@@ -277,8 +277,10 @@ describe('Integrational tests', () => {
             await bc.loadFrom(state);
         }
 
-        snapStates = new Map<string, BlockchainSnapshot>();
-        snapStates.set('initial', bc.snapshot());
+        if (!snapStates) {
+            snapStates = new Map<string, BlockchainSnapshot>();
+            snapStates.set('initial', bc.snapshot());
+        }
         getContractData = async (address: Address) => {
             const smc = await bc.getContract(address);
             if(!smc.account.account)
